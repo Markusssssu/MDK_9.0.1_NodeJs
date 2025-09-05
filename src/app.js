@@ -5,8 +5,6 @@ async function main() {
   try {
     await sequelize.authenticate();
     await sequelize.sync({ force: true });
-
-    console.log('👨‍🎓 Создаем студента...');
     const student = await Student.create({
       firstName: 'Mark',
       secondName: 'Mansurov',
@@ -14,7 +12,7 @@ async function main() {
       course: 3
     }); 
   } catch (error) {
-    console.error('Ошибка:', error.message);
+    console.error(error);
   } finally {
     await sequelize.close();
   }
