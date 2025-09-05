@@ -6,7 +6,7 @@ const sequelize = new Sequelize({
   password: '',
   host: 'localhost',
   dialect: 'mysql',
-  logging: false  // Отключаем логи SQL запросов
+  logging: false  
 });
 
 module.exports = { sequelize, Sequelize };
