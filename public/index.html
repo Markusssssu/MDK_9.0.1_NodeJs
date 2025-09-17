@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Auth</title>
+</head>
+<body>
+    <div id="login">
+        <h1>Login</h1>
+        <form id="login-form">
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <button>Login</button>
+        </form>
+        <a href="#" id="reg-link">Register</a>
+        <div id="msg"></div>
+    </div>
+
+    <div id="register" style="display:none">
+        <h1>Register</h1>
+        <form id="register-form">
+            <input type="text" placeholder="Name" required>
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <button>Register</button>
+        </form>
+        <a href="#" id="login-link">Login</a>
+        <div id="reg-msg"></div>
+    </div>
+
+    <div id="dashboard" style="display:none">
+        <h1>Welcome <span id="name"></span></h1>
+        <button id="logout">Logout</button>
+    </div>
+
+    <script>
+        const login = document.getElementById('login');
+        const reg = document.getElementById('register');
+        const dash = document.getElementById('dashboard');
+
+        document.getElementById('reg-link').onclick = e => {
+            e.preventDefault();
+            login.style.display = 'none';
+            reg.style.display = 'block';
+        };
+
+        document.getElementById('login-link').onclick = e => {
+            e.preventDefault();
+            reg.style.display = 'none';
+            login.style.display = 'block';
+        };
+
+        document.getElementById('login-form').onsubmit = async e => {
+            e.preventDefault();
+            const d = new FormData(e.target);
+            const r = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: d.get('email'), password: d.get('password') })
+            });
+            const j = await r.json();
+            if (r.ok) {
+                dash.style.display = 'block';
+                login.style.display = 'none';
+                document.getElementById('name').textContent = j.user.name;
+            } else {
+                document.getElementById('msg').textContent = j.error;
+            }
+        };
+
+        document.getElementById('register-form').onsubmit = async e => {
+            e.preventDefault();
+            const d = new FormData(e.target);
+            const r = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: d.get('name'), email: d.get('email'), password: d.get('password') })
+            });
+            const j = await r.json();
+            if (r.ok) {
+                dash.style.display = 'block';
+                reg.style.display = 'none';
+                document.getElementById('name').textContent = j.user.name;
+            } else {
+                document.getElementById('reg-msg').textContent = j.error;
+            }
+        };
+
+        document.getElementById('logout').onclick = async () => {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            dash.style.display = 'none';
+            login.style.display = 'block';
+        };
+
+        (async () => {
+            const r = await fetch('/api/auth/check');
+            const j = await r.json();
+            if (j.authenticated) {
+                dash.style.display = 'block';
+                login.style.display = 'none';
+                document.getElementById('name').textContent = j.user.name;
+            }
+        })();
+    </script>
+</body>
+</html>
